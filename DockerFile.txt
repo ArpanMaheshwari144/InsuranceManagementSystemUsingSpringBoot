@@ -1,0 +1,42 @@
+# Step 1: Build the Docker image from the Dockerfile in the current directory
+# The '-t' flag allows you to tag the image with a name ('insurance_crud' in this case)
+docker build -t insurance_crud .
+
+# Step 2: List all Docker images to verify that your image has been built successfully
+docker images
+
+# Step 3: Run a Docker container from the 'insurance_crud' image and map port 8081 on the host to port 8081 in the container
+docker run -p 8081:8081 insurance_crud
+
+# Step 4: Run a MySQL container, specifying the version of MySQL (replace '(version)' with the actual version number)
+docker run mysql:(version)
+
+# Step 5: Run a MySQL container with specific environment variables:
+# - Expose and map port 3307 on the host to port 3306 in the container
+# - Set the MySQL root password and database name
+# - Run the container in detached mode ('-d')
+docker run -p 3307:3306 --name your_container_name -e MYSQL_ROOT_PASSWORD=your_password -e MYSQL_DATABASE=your_database_name -d mysql
+
+# Step 6: Create a Docker network named 'networkmysql'
+docker network create networkmysql
+
+# Step 7: Connect the previously created MySQL container to the 'networkmysql' network
+docker network connect networkmysql your_container_name
+
+# Step 8: Build the Docker image again (optional step, if changes have been made)
+# The '-t' flag is used to tag the image with a name
+docker build -t your_image_name .
+
+# Step 9: Run the 'insurance_crud' container with environment variables for MySQL connection:
+# - Map port 8090 on the host to port 8081 in the container
+# - Connect the container to the 'networkmysql' network
+# - Specify MySQL host, port, database name, user, and password
+docker run -p 8090:8081 --name insurancecrudcontainer --net networkmysql \
+  -e MYSQL_HOST=your_mysql_container_name \
+  -e MYSQL_PORT=3306 \
+  -e MYSQL_DB_NAME=your_database_name \
+  -e MYSQL_USER=your_mysql_user \
+  -e MYSQL_PASSWORD=your_password your_image_name
+
+# Step 10: List all running containers to verify that your containers are running as expected
+docker ps
