@@ -233,3 +233,20 @@ List all running containers to verify that your containers are running as expect
 ```bash
 docker ps
 ```
+
+---
+
+## **Application Properties Configuration**
+
+Add the following configurations to your `application.properties` file:
+
+```properties
+server.port=8081
+spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB_NAME:db_name}
+spring.datasource.username=${MYSQL_USER:db_user}
+spring.datasource.password=${MYSQL_PASSWORD:db_password}
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+```
