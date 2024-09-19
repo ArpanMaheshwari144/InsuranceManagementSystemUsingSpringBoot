@@ -1,5 +1,6 @@
 package com.javatpoint.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,14 @@ public class CustomerService {
 	}
 
 	public List<Object[]> getAllCustomersClaimsById(int id) {
-		return customerRepository.getAllCustomersClaimsById(id);
+		List<Object[]> list = new ArrayList<Object[]>();
+		try {
+			list = customerRepository.getAllCustomersClaimsById(id);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return list;
 	}
 
 

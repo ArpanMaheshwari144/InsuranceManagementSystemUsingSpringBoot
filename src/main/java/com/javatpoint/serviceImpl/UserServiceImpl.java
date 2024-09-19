@@ -1,5 +1,7 @@
 package com.javatpoint.serviceImpl;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +82,20 @@ public class UserServiceImpl implements UserService {
 			return new LoginMessage("email does not exist",false);
 			
 		}
+	}
+	
+	public boolean updateLoginTime(String email) {
+		Optional<User> user1=Optional.ofNullable(userRepository.findByEmail(email));
+		if(user1.isPresent()) {
+			User user = user1.get();
+			user.setLast_login(Timestamp.valueOf(LocalDateTime.now()));
+			user.setEmail_sent(false);
+			userRepository.save(user);
+			return true;
+			
+		}
+		return false;
+		
 	}
 	
 

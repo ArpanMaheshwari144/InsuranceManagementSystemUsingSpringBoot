@@ -9,7 +9,7 @@ import com.javatpoint.model.Employee;
 
 public interface EmployeeRepository extends CrudRepository<Employee, Integer>  {
 	
-	@Query(nativeQuery = true ,value="select first_name,last_name from employee")
+	@Query(nativeQuery = true ,value="select * from employee")
 	public List<Employee> getAllEmployee();
 
 }

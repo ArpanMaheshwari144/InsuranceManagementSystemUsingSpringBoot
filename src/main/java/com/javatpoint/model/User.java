@@ -1,5 +1,7 @@
 package com.javatpoint.model;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,6 +28,12 @@ public class User {
 	
 	@Column(name = "email")
 	private String email;
+	
+	@Column(name = "email_sent")
+	private boolean email_sent;
+	
+	@Column(name = "last_login")
+	private Timestamp last_login;
 
 	public User() {
 		super();
@@ -71,6 +79,23 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+	public boolean getEmail_sent() {
+		return email_sent;
+	}
+
+	public void setEmail_sent(boolean email_sent) {
+		this.email_sent = email_sent;
+	}
+
+	public Timestamp  getLast_login() {
+		return last_login;
+	}
+
+	public void setLast_login(Timestamp timestamp) {
+		this.last_login = timestamp;
+	}
+	
 	
 
 }

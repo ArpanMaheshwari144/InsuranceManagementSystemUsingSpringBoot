@@ -47,6 +47,13 @@ public class Customers {
 		this.claims = claims;
 	}
 
+	@Override
+	public String toString() {
+		return "Customers [id=" + id + ", policies=" + policies + ", claims=" + claims + "]";
+	}
+	
+	
+
 	
 
 }

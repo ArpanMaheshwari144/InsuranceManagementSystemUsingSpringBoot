@@ -7,6 +7,8 @@ import java.util.Map;
 
 import javax.persistence.EntityNotFoundException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +48,8 @@ import com.javatpoint.service.UserService;
 public class InsuranceController {
 //autowire the BooksService class
 	
+	private static final Logger logger=LoggerFactory.getLogger(InsuranceController.class);
+	
 	
 	@Autowired
 	CustomerService customerService;
@@ -70,29 +74,20 @@ public class InsuranceController {
 	
 	
 	
-	
-	
-	
-
-	
 	@RequestMapping(value = "/api/customers",method = RequestMethod.GET)
     public List<Customers> getAllCustomers(){
     	 List<Customers> customers = customerService.getAllCustomers();
-    	 return customers;
+    	    logger.info("Successfully retrieved {} customers.", customers.size());
+    	    for (Customers customer : customers) {
+    	        logger.info("Customer details: {}", customer.toString());
+    	    };
+    	    return customers;
     }
-	
-	@RequestMapping(value="/api/employee", method=RequestMethod.GET)
-	public List <Employee> getAllEmploye(){
-		List<Employee> employee =employeeService.getAllEmployee();
-		return employee;
-	}
-    
     @RequestMapping(value = "/api/customers/{id}",method = RequestMethod.GET)
     public List<Customers> getAllCustomersById(@PathVariable("id")int id){
     	 List<Customers> customersById = customerService.getAllCustomersById(id);
     	 return customersById;
     }
-    
     @RequestMapping(value = "/api/customers/{id}/policies",method = RequestMethod.GET)
     public List<String> getAllCustomersPolicesById(@PathVariable("id")int id){
     	 List<Object[]> customersPolicesById = customerService.getAllCustomersPolicesById(id);
@@ -105,36 +100,50 @@ public class InsuranceController {
     	 }
     	 return ans;
     }
-    
     @RequestMapping(value = "/api/customers/{id}/claims",method = RequestMethod.GET)
     public List<String> getAllCustomersClaimsById(@PathVariable("id")int id){
-    	 List<Object[]> customersClaimsById = customerService.getAllCustomersClaimsById(id);
-    	 List<String> ans= new ArrayList<String>();
-    	 for (Object[] result :customersClaimsById ) {
-             Integer customerId = (Integer) result[0];   
-             String claim = (String) result[1];
-             String formatans = "Customer ID: " + customerId + ", Claim: " + claim;
-             ans.add(formatans);
-    	 }
+    	List<Object[]> customersClaimsById = customerService.getAllCustomersClaimsById(id);
+		 List<String> ans= new ArrayList<String>();
+    	 try {
+			 for (Object[] result :customersClaimsById ) {
+			     Integer customerId = (Integer) result[0];   
+			     String claim = (String) result[1];
+			     String formatans = "Customer ID: " + customerId + ", Claim: " + claim;
+			     ans.add(formatans);
+			 }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     	 return ans;
     }
-    
     @RequestMapping(value = "/api/policies",method = RequestMethod.GET)
     public List<Policy> getAllPolicies(){
-    	 List<Policy> policies = policyService.getAllPolices();
+    	List<Policy> policies = new ArrayList<Policy>();
+    	 try {
+			policies = policyService.getAllPolices();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     	 return policies;
     }
     @RequestMapping(value = "/api/policies/{id}",method = RequestMethod.GET)
     public List<Policy> getAllPoliciesById(@PathVariable("id")int id){
-    	 List<Policy> policiesById = policyService.getAllPoliciesById(id);
-    	 return policiesById;
+    	List<Policy> policiesById=new ArrayList<Policy>();
+    	try {
+    		policiesById=policyService.getAllPoliciesById(id);
+    	}catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	return policiesById;
     }
     @RequestMapping(value="/api/create/policies",method = RequestMethod.POST)
 	private void savePolicies(@RequestBody Policy policy) {
-    	policyService.saveOrUpdatePolicy(policy);
-		
+    	policyService.saveOrUpdatePolicy(policy);	
 	}
-    
+    @RequestMapping(value="api/create/employee",method=RequestMethod.POST)
+    private void saveEmployee(@RequestBody Employee employee) {
+    	employeeService.saveOrUpdateEmployee(employee);
+    }
     @PutMapping(value="/api/update/policy/{id}")
     public ResponseEntity<Policy> updatePolicy(@PathVariable int id,@RequestBody Policy policy){
     	Policy p = policyService.getPoliciesById(id);
@@ -143,8 +152,7 @@ public class InsuranceController {
     	}
     	p.setPolicies(policy.getPolicies());
     	Policy updatePolicy = policyRepository.save(p);
-    	return ResponseEntity.ok(updatePolicy);
-    	
+    	return ResponseEntity.ok(updatePolicy);	
     }
     @RequestMapping(value = "/api/get/policy/{id}",method = RequestMethod.GET)
     public Policy getPolicyById(@PathVariable("id")int id){
@@ -168,8 +176,7 @@ public class InsuranceController {
 		
 	}
     
-    
-    @RequestMapping(value="/api/update/claim/{id}")
+    @PutMapping(value="/api/update/claim/{id}")
     public ResponseEntity<Claim>updateClaim(@PathVariable int id,@RequestBody Claim claim ){
     	Claim c = claimService.getClaimaById(id);
     	c.setClaims(claim.getClaims());
@@ -213,17 +220,24 @@ public class InsuranceController {
 	}
     @RequestMapping(value="/login",method = RequestMethod.POST)
 	private ResponseEntity<?> saveLogin(@RequestBody LoginDTO logindto) {
+    	boolean msg = userService.updateLoginTime(logindto.getEmail());
+    	
     	LoginMessage message = userService.loginUser(logindto);
-    	return ResponseEntity.ok(message);
+        if(msg) {
+        	return ResponseEntity.ok("login suceesfull");
+    		
+    		}
+        else {
+        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user not found");
+        }
 		
 	}
     
     // DUMMY
     
-    
-    
-    
-    
-    
-	
+    @RequestMapping(value="/api/employee", method=RequestMethod.GET)
+	public List <Employee> getAllEmploye(){
+		List<Employee> employee =employeeService.getAllEmployee();
+		return employee;
+	}
 }

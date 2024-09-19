@@ -8,6 +8,7 @@ public interface UserService {
 	
 	LoginMessage addUser(UserDTO userdto);
 	LoginMessage loginUser(LoginDTO logindto);
+	boolean updateLoginTime(String email);
 	
 
 }
