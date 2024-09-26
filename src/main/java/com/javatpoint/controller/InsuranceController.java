@@ -22,13 +22,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.javatpoint.model.Customers;
 import com.javatpoint.model.Employee;
 import com.javatpoint.model.LoginMessage;
 import com.javatpoint.model.Policy;
-
+import com.javatpoint.model.Product;
 import com.javatpoint.repository.ClaimRepository;
 import com.javatpoint.repository.PolicyRepository;
 import com.javatpoint.repository.UserRepository;
@@ -40,7 +42,10 @@ import com.javatpoint.service.ClaimService;
 import com.javatpoint.service.CustomerService;
 import com.javatpoint.service.EmployeeService;
 import com.javatpoint.service.PolicyService;
+import com.javatpoint.service.ProductService;
 import com.javatpoint.service.UserService;
+
+import Helper.Helper;
 
 //mark class as Controller
 @RestController
@@ -65,6 +70,9 @@ public class InsuranceController {
 	
 	@Autowired
 	ClaimRepository claimRepository;
+	
+	@Autowired
+	ProductService productService;
 	
 	@Autowired
 	UserService userService;
@@ -224,7 +232,7 @@ public class InsuranceController {
     	
     	LoginMessage message = userService.loginUser(logindto);
         if(msg) {
-        	return ResponseEntity.ok("login suceesfull");
+        	return ResponseEntity.ok(message);
     		
     		}
         else {
@@ -240,4 +248,23 @@ public class InsuranceController {
 		List<Employee> employee =employeeService.getAllEmployee();
 		return employee;
 	}
+    
+    
+    @PostMapping("/product/upload")
+    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
+        if (Helper.checkExcelFormat(file)) {
+            this.productService.save(file);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "File uploaded successfully");
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please correct the file format.");
+        }
+    }
+    
+    @GetMapping("/product")
+    public List<Product> getAllProduct(){
+    	return this.productService.getAllProduct();
+    	
+    }
 }

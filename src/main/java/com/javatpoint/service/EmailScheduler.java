@@ -21,7 +21,7 @@ public class EmailScheduler {
 	@Autowired
 	EmailService emailService;
 	
-	@Scheduled(cron = "*/1 * * * * *") 
+//	@Scheduled(cron = "*/1 * * * * *") 
 	public void sendEmailToEligibleUsers(){
 		System.out.println("ehjfguew");
 		LocalDateTime time24HoursAgo = LocalDateTime.now().minusMinutes(1); 
