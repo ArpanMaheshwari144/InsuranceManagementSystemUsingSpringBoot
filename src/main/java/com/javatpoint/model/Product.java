@@ -20,9 +20,9 @@ public class Product {
 	private String productDesc;
 
 	@Column(name = "productprice")
-	private String productPrice;
+	private Long productPrice;
 
-	public Product(Integer productId, String productName, String productDesc, String productPrice) {
+	public Product(Integer productId, String productName, String productDesc, Long productPrice) {
 		super();
 		this.productId = productId;
 		this.productName = productName;
@@ -59,11 +59,11 @@ public class Product {
 		this.productDesc = productDesc;
 	}
 
-	public String getProductPrice() {
+	public Long getProductPrice() {
 		return productPrice;
 	}
 
-	public void setProductPrice(String productPrice) {
+	public void setProductPrice(Long productPrice) {
 		this.productPrice = productPrice;
 	}
 

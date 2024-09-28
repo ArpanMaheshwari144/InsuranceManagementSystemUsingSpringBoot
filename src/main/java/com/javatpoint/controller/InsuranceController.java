@@ -41,6 +41,7 @@ import com.javatpoint.model.Claim;
 import com.javatpoint.service.ClaimService;
 import com.javatpoint.service.CustomerService;
 import com.javatpoint.service.EmployeeService;
+import com.javatpoint.service.OtpService;
 import com.javatpoint.service.PolicyService;
 import com.javatpoint.service.ProductService;
 import com.javatpoint.service.UserService;
@@ -79,6 +80,9 @@ public class InsuranceController {
 	
 	@Autowired
 	EmployeeService employeeService;
+	
+	@Autowired
+	OtpService otpService;
 	
 	
 	
@@ -266,5 +270,15 @@ public class InsuranceController {
     public List<Product> getAllProduct(){
     	return this.productService.getAllProduct();
     	
+    }
+    @PostMapping("/forgot/password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request ) {
+       String email=request.get("email");
+       try {
+           otpService.resetPassword(email);
+           return ResponseEntity.ok("OTP sent to your email.");
+       } catch (Exception e) {
+           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+       }
     }
 }

@@ -14,6 +14,8 @@ import com.javatpoint.model.Product;
 
 public class Helper {
 	
+	
+	// ye check karenga kiye excel file sahi hai ya nahi
 	public static boolean checkExcelFormat(MultipartFile file) {
 		
 		String contentType=file.getContentType();
@@ -24,7 +26,7 @@ public class Helper {
 			return false;
 		}
 	}
-	
+//	 Excel file ko convert karega list me
 	public static List<Product>convertToListExcelOfProduct(InputStream is){
 		
 		List<Product> list =new ArrayList<>();
@@ -55,13 +57,14 @@ public class Helper {
 							p.setProductId((int)cell.getNumericCellValue());
 							break;
 						case 1:
+							p.setProductDesc(cell.getStringCellValue());
+							break;
+							
+						case 2:
 							p.setProductName(cell.getStringCellValue());
 							break;
-						case 2:
-							p.setProductPrice(cell.getStringCellValue());
-							break;
 						case 3:
-							p.setProductDesc(cell.getStringCellValue());
+							p.setProductPrice((long) cell.getNumericCellValue());
 							break;
 						default:
 							break;
