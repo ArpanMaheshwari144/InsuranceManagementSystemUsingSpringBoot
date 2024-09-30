@@ -271,14 +271,33 @@ public class InsuranceController {
     	return this.productService.getAllProduct();
     	
     }
-    @PostMapping("/forgot/password")
-    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request ) {
+    @PostMapping("/request/otp")
+    public ResponseEntity<?> requestOtp(@RequestBody Map<String, String> request) {
        String email=request.get("email");
        try {
-           otpService.resetPassword(email);
-           return ResponseEntity.ok("OTP sent to your email.");
+           otpService.generateAndSendOtp(email);
+           return ResponseEntity.ok("Password sent to your email.");
        } catch (Exception e) {
            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
        }
     }
+    @PostMapping("/verify/otp")
+    public ResponseEntity<String> verifyOtp(@RequestBody Map<String, String> request) {
+       String email=request.get("email");
+       String otp=request.get("otp");
+       if(otpService.verifyOtp(email, otp)) {
+    	   return ResponseEntity.ok("OTP verified. You can now reset your password.");
+       }
+       else {
+    	   return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired OTP.");
+       }
+    }
+    @PostMapping("/reset/password")
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
+       String email=request.get("email");
+       String newPassword=request.get("newPassword");
+       otpService.resetPassword(email, newPassword);
+       return ResponseEntity.ok("Password reset succesfully");
+    }
+    
 }

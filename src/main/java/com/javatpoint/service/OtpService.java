@@ -2,6 +2,8 @@ package com.javatpoint.service;
 
 import com.javatpoint.model.User;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -30,12 +32,12 @@ public class OtpService {
 		javaMailSender.send(message);
 	}
 
-	public void resetPassword(String email) {
+	public void generateAndSendOtp(String email) {
 		User user = userRepository.findByEmail(email);
 		if (user != null) {
 			String otp = generateOTP();
-			String hashedotp=passwordEncoder.encode(otp);
-			user.setPassword(hashedotp); // You may want to hash it for security
+			user.setOtp(otp);
+			user.setOtp_expired_time(LocalDateTime.now().plusMinutes(20));
 			userRepository.save(user);
 			sendOtpEmail(email, otp);
 		} else {
@@ -46,6 +48,27 @@ public class OtpService {
 	public String generateOTP() {
 		int otp = (int) (Math.random() * 9000) + 1000;
 		return String.valueOf(otp);
+	}
+	
+	public boolean verifyOtp(String email,String otp) {
+		User user = userRepository.findByEmail(email);
+		if (user!=null && user.getOtp().equals(otp) &&
+				user.getOtp_expired_time().isAfter(LocalDateTime.now())) {
+			return true;
+		}
+		return false;
+	}
+	
+	public void resetPassword(String email, String newPassword) {
+		User user = userRepository.findByEmail(email);
+		if(user!=null) {
+			String hashedPassword=passwordEncoder.encode(newPassword);
+			user.setPassword(hashedPassword);
+			user.setOtp(null);
+			user.setOtp_expired_time(null);
+			userRepository.save(user);
+		}
+		
 	}
 
 }
