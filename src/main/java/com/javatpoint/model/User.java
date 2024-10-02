@@ -42,6 +42,15 @@ public class User {
 	@Column(name = "otp_expired_time")
 	private LocalDateTime otp_expired_time ;
 	
+	@Column(name = "verification_token")
+	private String verification_token;
+	
+	@Column(name = "verification_token_expired_time")
+	private LocalDateTime verification_token_expired_time;
+	
+	@Column(name = "is_enabled")
+	private boolean is_enabled=false;
+	
 	
 
 	public User() {
@@ -49,7 +58,9 @@ public class User {
 		// TODO Auto-generated constructor stub
 	}
 
-	public User(int userid, String username, String email,String password,String otp,LocalDateTime otp_expired_time) {
+	public User(int userid, String username, String email,String password,
+			String otp,LocalDateTime otp_expired_time,
+			String verification_token,LocalDateTime verification_token_expired_time,boolean is_enabled) {
 		super();
 		this.userid = userid;
 		this.username = username;
@@ -57,6 +68,17 @@ public class User {
 		this.email = email;
 		this.otp=otp;
 		this.otp_expired_time=otp_expired_time;
+		this.verification_token=verification_token;
+		this.verification_token_expired_time=verification_token_expired_time;
+		this.is_enabled=is_enabled;
+	}
+	public User(int userid, String username, String email,String password) {
+		super();
+		this.userid = userid;
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		
 	}
 	
 
@@ -123,6 +145,36 @@ public class User {
 	public void setOtp_expired_time(LocalDateTime otp_expired_time) {
 		this.otp_expired_time = otp_expired_time;
 	}
+
+	public String getVerification_token() {
+		return verification_token;
+	}
+
+	public void setVerification_token(String verification_token) {
+		this.verification_token = verification_token;
+	}
+
+	public LocalDateTime getVerification_token_expired_time() {
+		return verification_token_expired_time;
+	}
+
+	public void setVerification_token_expired_time(LocalDateTime verification_token_expired_time) {
+		this.verification_token_expired_time = verification_token_expired_time;
+	}
+
+	public boolean isIs_enabled() {
+		return is_enabled;
+	}
+
+	public void setIs_enabled(boolean is_enabled) {
+		this.is_enabled = is_enabled;
+	}
+	
+    
+//	
+	
+	
+	
 	
 	
 	

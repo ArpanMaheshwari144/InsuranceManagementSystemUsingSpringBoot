@@ -19,6 +19,9 @@ public interface UserRepository extends CrudRepository<User, Integer> {
 	@Query(value = "select * from user where last_login<=:time and email_sent=false",nativeQuery = true)
 	List<User> getUserLoggedIn24HoursAgo(@Param("time") LocalDateTime time);
 	
+	@Query(value = "select * from user where verification_token=:token",nativeQuery = true)
+	User findByVerificationToken(@Param("token") String token);
+	
 	
 
 }

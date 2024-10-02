@@ -1,5 +1,6 @@
 package com.javatpoint.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ import com.javatpoint.model.Employee;
 import com.javatpoint.model.LoginMessage;
 import com.javatpoint.model.Policy;
 import com.javatpoint.model.Product;
+import com.javatpoint.model.User;
 import com.javatpoint.repository.ClaimRepository;
 import com.javatpoint.repository.PolicyRepository;
 import com.javatpoint.repository.UserRepository;
@@ -68,6 +70,9 @@ public class InsuranceController {
 	
 	@Autowired
 	PolicyRepository policyRepository;
+	
+	@Autowired
+	UserRepository userRepository;
 	
 	@Autowired
 	ClaimRepository claimRepository;
@@ -298,6 +303,22 @@ public class InsuranceController {
        String newPassword=request.get("newPassword");
        otpService.resetPassword(email, newPassword);
        return ResponseEntity.ok("Password reset succesfully");
+    }
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam String token){
+    	User user=userService.findByVerificationToken(token);
+    	if(user==null || 
+    			user.getVerification_token_expired_time().isBefore(LocalDateTime.now())) {
+    		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or Expired Token");
+    		
+    	}
+    	user.setIs_enabled(true);
+    	user.setVerification_token(null);
+    	user.setVerification_token_expired_time(null);
+    	userRepository.save(user);
+    	return ResponseEntity.ok("Email Veriefied SuccessFully");
+    	
+    	
     }
     
 }

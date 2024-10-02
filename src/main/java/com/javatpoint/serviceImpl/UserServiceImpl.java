@@ -3,8 +3,12 @@ package com.javatpoint.serviceImpl;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +17,7 @@ import com.javatpoint.DTO.UserDTO;
 import com.javatpoint.model.LoginMessage;
 import com.javatpoint.model.User;
 import com.javatpoint.repository.UserRepository;
-
+import com.javatpoint.service.EmailService;
 import com.javatpoint.service.UserService;
 @Service
 public class UserServiceImpl implements UserService {
@@ -23,6 +27,12 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	EmailService emailService;
+	
+	private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@(.+)$";
+
 	
 	
 
@@ -49,7 +59,14 @@ public class UserServiceImpl implements UserService {
 //			}
 //			
 //		}
-		
+		if(!isValidEmail(user.getEmail())) {
+			return new LoginMessage("envalid email",false);
+		}
+		String token=UUID.randomUUID().toString();
+		user.setVerification_token(token);
+		user.setVerification_token_expired_time(LocalDateTime.now().plusHours(24));	
+		user.setIs_enabled(false);
+		emailService.sendVerificationEmail(user);
 		userRepository.save(user);
 		return new LoginMessage("Login succes", true);
 	}
@@ -86,7 +103,7 @@ public class UserServiceImpl implements UserService {
 	
 	public boolean updateLoginTime(String email) {
 		Optional<User> user1=Optional.ofNullable(userRepository.findByEmail(email));
-		if(user1.isPresent()) {
+		if(user1.isPresent() && user1.get().isIs_enabled()==true) {
 			User user = user1.get();
 			user.setLast_login(Timestamp.valueOf(LocalDateTime.now()));
 			user.setEmail_sent(false);
@@ -96,6 +113,19 @@ public class UserServiceImpl implements UserService {
 		}
 		return false;
 		
+	}
+
+
+
+	@Override
+	public User findByVerificationToken(String token) {
+		return userRepository.findByVerificationToken(token);
+		
+	}
+	
+	public boolean isValidEmail(String email) {
+		Pattern pattern=Pattern.compile(EMAIL_REGEX);
+		return pattern.matcher(email).matches();
 	}
 	
 
