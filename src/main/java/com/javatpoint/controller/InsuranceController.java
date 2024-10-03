@@ -240,29 +240,7 @@ public class InsuranceController {
     	return ResponseEntity.ok(response);
 
     }
-    @RequestMapping(value="/save",method = RequestMethod.POST)
-	private ResponseEntity<?> saveUser(@RequestBody UserDTO userdto) {
-    	LoginMessage message = userService.addUser(userdto);
-    	return ResponseEntity.ok(message);
-		
-	}
-    @RequestMapping(value="/login",method = RequestMethod.POST)
-	private ResponseEntity<?> saveLogin(@RequestBody LoginDTO logindto) {
-    	boolean msg = userService.updateLoginTime(logindto.getEmail());
-    	
-    	LoginMessage message = userService.loginUser(logindto);
-        if(msg) {
-        	return ResponseEntity.ok(message);
-    		
-    		}
-        else {
-        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user not found");
-        }
-		
-	}
-    
-    // DUMMY
-    
+ 
     @RequestMapping(value="/api/employee", method=RequestMethod.GET)
 	public List <Employee> getAllEmploye(){
 		List<Employee> employee =employeeService.getAllEmployee();
@@ -287,6 +265,27 @@ public class InsuranceController {
     	return this.productService.getAllProduct();
     	
     }
+//     Spring security
+    @RequestMapping(value="/save",method = RequestMethod.POST)
+	private ResponseEntity<?> saveUser(@RequestBody UserDTO userdto) {
+    	LoginMessage message = userService.addUser(userdto);
+    	return ResponseEntity.ok(message);
+		
+	}
+    @RequestMapping(value="/login",method = RequestMethod.POST)
+	private ResponseEntity<?> saveLogin(@RequestBody LoginDTO logindto) {
+    	boolean msg = userService.updateLoginTime(logindto.getEmail());
+    	
+    	LoginMessage message = userService.loginUser(logindto);
+        if(msg) {
+        	return ResponseEntity.ok(message);
+    		
+    		}
+        else {
+        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user not found");
+        }
+		
+	}
     @PostMapping("/request/otp")
     public ResponseEntity<?> requestOtp(@RequestBody Map<String, String> request) {
        String email=request.get("email");
