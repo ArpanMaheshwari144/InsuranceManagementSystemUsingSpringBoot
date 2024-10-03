@@ -13,6 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,6 +41,7 @@ import com.javatpoint.repository.ClaimRepository;
 import com.javatpoint.repository.PolicyRepository;
 import com.javatpoint.repository.UserRepository;
 import com.javatpoint.DTO.LoginDTO;
+import com.javatpoint.DTO.PasswordChangeRequest;
 import com.javatpoint.DTO.UserDTO;
 import com.javatpoint.model.Claim;
 
@@ -69,10 +74,16 @@ public class InsuranceController {
 	PolicyService policyService;
 	
 	@Autowired
+	PasswordEncoder passwordEncoder;
+	
+	@Autowired
 	PolicyRepository policyRepository;
 	
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	AuthenticationManager authenticationManager;
 	
 	@Autowired
 	ClaimRepository claimRepository;
@@ -320,5 +331,43 @@ public class InsuranceController {
     	
     	
     }
+    @PostMapping("/change/password")
+    public ResponseEntity<String> changePassword(@RequestBody PasswordChangeRequest passwordChangeRequest) {
+        if (!passwordChangeRequest.getNewPassword().equals(passwordChangeRequest.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body("New password and confirm password did not match");
+        }
+
+        try {
+           
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            passwordChangeRequest.getEmail(), 
+                            passwordChangeRequest.getCurrentPassword()
+                    )
+            );
+            
+            
+            if (!authentication.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid current password");
+            }
+
+            
+            User user = userRepository.findByEmail(passwordChangeRequest.getEmail());
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+
+            
+            user.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
+            userRepository.save(user);
+
+            return ResponseEntity.ok("Password successfully updated");
+
+        } catch (Exception e) {
+            e.printStackTrace(); 
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
+        }
+    }
+
     
 }
